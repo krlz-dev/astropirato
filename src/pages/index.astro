@@ -17,8 +17,8 @@ export const prerender = true;
         <br>
         <div class="search-tool">
             <div class="search-bar">
-                <label  for="main-input"> </label>
-                <input id="main-input" class="main-input" type="text"/>
+                <label for="main-input"> </label>
+                <input id="main-input" class="main-input" type="text" placeholder="Search some content ..."/>
                 <button id="main-search-button" class="main-search-button">Search!</button>
             </div>
             <div id="status-text" class="status-text">
@@ -39,7 +39,29 @@ export const prerender = true;
             <tbody id="data-body">
             </tbody>
         </table>
+
+
+        <div style="margin-top: 72px">
+
+            <small >
+                <b>Note:</b>
+                Hi! I hope you enjoy this extension. It represents a strong effort to provide you with a quality service that will periodically verify and monitor the mirrors used to offer a fresh directory for each request you make. This service is free, and no metrics are collected from your requests. There are no ads involved. This service relies solely on your support and donations to keep the server running and, of course, your feedback as a user. Thank you in advance for any feedback and suggestions for improvement.
+            </small>
+
+            <div style="text-align: center; margin: 20px 0">
+                <iframe
+                        src="https://funding.wmtransfer.com/widgets/horizontal/0dccf3d8-0342-447a-925e-dc5bca9318d6?bt=0&amp;hs=1&amp;sum=1&amp;hsb=1&amp;hab=1&amp;hsbp=1&amp;hym=1&amp;hmc=1&amp;hbtc=1"
+                        width="468"
+                        height="150"
+                        scrolling="no"
+                        style="border: none"
+                        data-savepage-key="0-0"></iframe>
+            </div>
+
+        </div>
+
     </div>
+
 </div>
 </body>
 </html>
@@ -61,13 +83,13 @@ export const prerender = true;
     async function searchTorrent() {
         const searchValue = mainInput.value
         searchButton.setAttribute('disabled', 'true')
-        mainInput.style.borderColor='#797979'
+        mainInput.style.borderColor = '#797979'
         loadText.innerHTML = "Loading..."
         const searchData = await fetch(`/data?q=${searchValue}`)
         const response = await searchData.json()
         loadText.innerHTML = getRandomEncouragement()
         searchButton.removeAttribute('disabled')
-        mainInput.style.borderColor='#CA7B6C'
+        mainInput.style.borderColor = '#CA7B6C'
         dataBody.innerHTML = ''
         setTable(response)
     }
@@ -95,6 +117,7 @@ export const prerender = true;
                 const a = document.createElement('a')
                 a.innerHTML = item.name
                 a.href = `magnet:?xt=urn:btih:${item.info_hash}&dn=${item.name}`
+                a.target = '_new'
                 a.title = item.name
                 nameDiv.appendChild(a)
                 tdTitle.appendChild(nameDiv)
@@ -213,7 +236,7 @@ export const prerender = true;
         font-size: 18px;
         width: 100%;
         border: 0;
-        border-bottom: #CA7B6C solid 2px;
+        border: #CA7B6C solid 2px;
         padding: 8px 16px;
     }
 
