@@ -1,15 +1,257 @@
 ---
+export const prerender = true;
 ---
-
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
+<head>
+    <meta charset="utf-8"/>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+    <meta name="viewport" content="width=device-width"/>
+    <meta name="generator" content={Astro.generator}/>
+    <title>El Pirato quality search torrent files!</title>
+</head>
+<body>
+
+<div class="container">
+    <div class="search">
+        <img src="/img/ship.svg" alt=""/>
+        <br>
+        <div class="search-tool">
+            <div class="search-bar">
+                <label style="width: 100%">
+                    <input id="main-input" class="main-input" type="text"/>
+                </label>
+                <button id="main-search-button" class="main-search-button">Search!</button>
+            </div>
+            <div id="status-text" class="status-text">
+                <small id="load-text">Search something cool!</small>
+            </div>
+        </div>
+        <table>
+            <thead>
+            <tr>
+                <td> Title</td>
+                <td> Author</td>
+                <td> Uploaded</td>
+                <td> Size</td>
+                <td> SE</td>
+                <td> LE</td>
+            </tr>
+            </thead>
+            <tbody id="data-body">
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
 </html>
+
+<script>
+    const dataBody = document.getElementById('data-body')
+    const mainInput = document.getElementById('main-input')
+    const searchButton = document.getElementById('main-search-button')
+    const loadText = document.getElementById('load-text')
+
+    mainInput.addEventListener("keyup",   (event) =>{
+        if (event.keyCode === 13) {
+            searchTorrent()
+        }
+    });
+
+    searchButton.addEventListener('click',()=> searchTorrent() )
+
+    async function searchTorrent ()  {
+        const searchValue = mainInput.value
+        loadText.innerHTML = "Loading..."
+        const searchData = await fetch(`/data?q=${searchValue}`)
+        const response = await searchData.json()
+        loadText.innerHTML = getRandomEncouragement()
+        dataBody.innerHTML = ''
+        setTable(response)
+    }
+
+    function setTable(response){
+        response.map(item => {
+                const calculateMiB = (size) => {
+                    return `MiB ${((item.size) / (1024 * 1024)).toFixed(2)}`
+                }
+                const calculateGiB = (size) => {
+                    return `GiB ${((item.size) / (1024 * 1024 * 1024)).toFixed(2)}`
+                }
+
+                const date = new Date(item.added * 1000)
+                const year = date.getFullYear()
+                const month = date.getMonth() + 1
+                const day = date.getDate()
+                const size = item.size < 1000000000 ? calculateMiB(item.size) : calculateGiB(item.size)
+                const uploadedDate = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`
+
+                const tr = document.createElement('tr')
+                const tdTitle = document.createElement('td')
+                const nameDiv = document.createElement('div')
+                nameDiv.classList.add('torrent-name')
+                const a = document.createElement('a')
+                a.innerHTML = item.name
+                a.href = `magnet:?xt=urn:btih:${item.info_hash}&dn=${item.name}`
+                a.title = item.name
+                nameDiv.appendChild(a)
+                tdTitle.appendChild(nameDiv)
+
+                const tdUsername = document.createElement('td')
+                tdUsername.innerHTML = item.username
+
+                const tdUploaded = document.createElement('td')
+                tdUploaded.innerHTML = uploadedDate
+
+                const tdSize = document.createElement('td')
+                tdSize.innerHTML = size
+
+                const tdSeeders = document.createElement('td')
+                tdSeeders.innerHTML = item.seeders
+
+                const tdLeechers = document.createElement('td')
+                tdLeechers.innerHTML = item.leechers
+
+                tr.appendChild(tdTitle)
+                tr.appendChild(tdUsername)
+                tr.appendChild(tdUploaded)
+                tr.appendChild(tdSize)
+                tr.appendChild(tdSeeders)
+                tr.appendChild(tdLeechers)
+
+                dataBody.appendChild(tr)
+            }
+        )
+
+    }
+
+    function getRandomEncouragement() {
+        const phrases = [
+            "Discover amazing content with a click!",
+            "Press the button and unlock a world of knowledge!",
+            "Search for content and expand your horizons!",
+            "Get ready to be inspired! Press the button!",
+            "Curiosity awaits! Give that button a push!",
+            "Find what you seek with a simple click!",
+            "Unleash the power of information! Press that button!",
+            "Take the plunge and explore! Press the button now!",
+            "Discover the unknown with a single click!",
+            "Press the button and let the adventure begin!",
+            "Get ready for a content extravaganza!",
+            "Navigate the vast world of knowledge with ease!",
+            "Uncover hidden treasures! Press the button!",
+            "Make your search a breeze! Push that button!",
+            "Embrace the unknown! Press the button to embark!",
+            "Expand your mind with the click of a button!",
+            "Prepare for an enlightening journey! Press the button!",
+            "Seek and you shall find! Start by pressing the button!",
+            "Unlock the door to endless possibilities! Push that button!",
+            "Navigate the sea of information with a click!"
+        ];
+
+        const randomIndex = Math.floor(Math.random() * phrases.length);
+        return phrases[randomIndex];
+    }
+
+</script>
+
+<style is:global>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+    }
+
+    a {
+        text-decoration: none;
+        color: #de711b;
+    }
+
+    a:hover {
+        color: #fbac67;
+    }
+
+    table {
+        width: 100%;
+        text-align: left;
+    }
+
+    thead {
+        position: sticky;
+        top: 90px;
+        z-index: 1000;
+        background-color: #DF8E7E;
+        color: white;
+    }
+
+    thead td {
+        padding: 4px 8px;
+    }
+
+    tbody td {
+        padding: 0 8px;
+        border-bottom: rgba(223, 142, 126, 0.46) solid 0.3px;
+    }
+
+    .torrent-name {
+        width: 200px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .search-tool {
+        position: sticky;
+        top: 0;
+        background-color: white;
+        z-index: 1000;
+    }
+
+    .main-input {
+        font-size: 18px;
+        width: 100%;
+        border: 0;
+        border-bottom: #CA7B6C solid 2px;
+        padding: 8px 16px;
+    }
+
+    .main-input:focus {
+        outline: none;
+    }
+
+    .search {
+        margin: 16px auto;
+        text-align: center;
+        max-width: 700px;
+    }
+
+    .search-bar {
+        display: flex;
+        padding: 8px 0;
+    }
+
+    .main-search-button {
+        border: none;
+        padding: 8px 16px;
+        border-radius: 5px;
+        margin: 0 0 0 8px;
+        background-color: #DF8E7E;
+        color: white;
+        transition: 0.3s;
+        cursor: pointer;
+    }
+
+    .main-search-button:hover {
+        background-color: #d15936
+    }
+
+    .main-search-button:focus {
+        outline: none;
+    }
+
+    .status-text {
+        color: #DF8E7E;
+        padding-top: 8px;
+        padding-bottom: 16px;
+    }
+</style>
+
