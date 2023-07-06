@@ -17,9 +17,8 @@ export const prerender = true;
         <br>
         <div class="search-tool">
             <div class="search-bar">
-                <label style="width: 100%">
-                    <input id="main-input" class="main-input" type="text"/>
-                </label>
+                <label  for="main-input"> </label>
+                <input id="main-input" class="main-input" type="text"/>
                 <button id="main-search-button" class="main-search-button">Search!</button>
             </div>
             <div id="status-text" class="status-text">
@@ -51,25 +50,29 @@ export const prerender = true;
     const searchButton = document.getElementById('main-search-button')
     const loadText = document.getElementById('load-text')
 
-    mainInput.addEventListener("keyup",   (event) =>{
+    mainInput.addEventListener("keyup", (event) => {
         if (event.keyCode === 13) {
             searchTorrent()
         }
     });
 
-    searchButton.addEventListener('click',()=> searchTorrent() )
+    searchButton.addEventListener('click', () => searchTorrent())
 
-    async function searchTorrent ()  {
+    async function searchTorrent() {
         const searchValue = mainInput.value
+        searchButton.setAttribute('disabled', 'true')
+        mainInput.style.borderColor='#797979'
         loadText.innerHTML = "Loading..."
         const searchData = await fetch(`/data?q=${searchValue}`)
         const response = await searchData.json()
         loadText.innerHTML = getRandomEncouragement()
+        searchButton.removeAttribute('disabled')
+        mainInput.style.borderColor='#CA7B6C'
         dataBody.innerHTML = ''
         setTable(response)
     }
 
-    function setTable(response){
+    function setTable(response) {
         response.map(item => {
                 const calculateMiB = (size) => {
                     return `MiB ${((item.size) / (1024 * 1024)).toFixed(2)}`
@@ -246,6 +249,11 @@ export const prerender = true;
 
     .main-search-button:focus {
         outline: none;
+    }
+
+    .main-search-button:disabled {
+        background-color: gray;
+        cursor: default;
     }
 
     .status-text {
